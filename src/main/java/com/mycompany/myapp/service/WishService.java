@@ -1,7 +1,12 @@
 package com.mycompany.myapp.service;
 
 import com.mycompany.myapp.domain.Wish;
+import com.mycompany.myapp.domain.WishList;
+import com.mycompany.myapp.repository.WishListRepository;
 import com.mycompany.myapp.repository.WishRepository;
+import com.mycompany.myapp.security.SecurityUtils;
+
+import org.mapstruct.ap.shaded.freemarker.template.utility.SecurityUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -10,6 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 
 /**
@@ -23,15 +30,23 @@ public class WishService {
     
     @Inject
     private WishRepository wishRepository;
+    
+    @Inject
+    private WishListRepository wishListRepository;
 
     /**
      * Save a wish.
      *
      * @param wish the entity to save
      * @return the persisted entity
+     * @throws AccessDeniedException 
      */
-    public Wish save(Wish wish) {
+    public Wish save(Wish wish) throws AccessDeniedException {
         log.debug("Request to save Wish : {}", wish);
+        WishList wishList = wishListRepository.getOne(wish.getWishList().getId());
+        if (!wishList.getUser().getLogin().equals(SecurityUtils.getCurrentUserLogin())) {
+        	throw new AccessDeniedException("Você não pode fazer isto!");
+        }
         Wish result = wishRepository.save(wish);
         return result;
     }
