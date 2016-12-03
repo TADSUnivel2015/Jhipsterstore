@@ -1,10 +1,14 @@
 package com.mycompany.myapp.web.rest;
 
-import com.codahale.metrics.annotation.Timed;
-import com.mycompany.myapp.domain.Wish;
-import com.mycompany.myapp.service.WishService;
-import com.mycompany.myapp.web.rest.util.HeaderUtil;
-import com.mycompany.myapp.web.rest.util.PaginationUtil;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.AccessDeniedException;
+import java.util.List;
+import java.util.Optional;
+
+import javax.inject.Inject;
+import javax.validation.Valid;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -12,14 +16,20 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.inject.Inject;
-import javax.validation.Valid;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Optional;
+import com.codahale.metrics.annotation.Timed;
+import com.mycompany.myapp.domain.Wish;
+import com.mycompany.myapp.service.WishService;
+import com.mycompany.myapp.web.rest.util.HeaderUtil;
+import com.mycompany.myapp.web.rest.util.PaginationUtil;
 
 /**
  * REST controller for managing Wish.
@@ -39,10 +49,11 @@ public class WishResource {
      * @param wish the wish to create
      * @return the ResponseEntity with status 201 (Created) and with body the new wish, or with status 400 (Bad Request) if the wish has already an ID
      * @throws URISyntaxException if the Location URI syntax is incorrect
+     * @throws AccessDeniedException 
      */
     @PostMapping("/wishes")
     @Timed
-    public ResponseEntity<Wish> createWish(@Valid @RequestBody Wish wish) throws URISyntaxException {
+    public ResponseEntity<Wish> createWish(@Valid @RequestBody Wish wish) throws URISyntaxException, AccessDeniedException {
         log.debug("REST request to save Wish : {}", wish);
         if (wish.getId() != null) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("wish", "idexists", "A new wish cannot already have an ID")).body(null);
@@ -61,10 +72,11 @@ public class WishResource {
      * or with status 400 (Bad Request) if the wish is not valid,
      * or with status 500 (Internal Server Error) if the wish couldnt be updated
      * @throws URISyntaxException if the Location URI syntax is incorrect
+     * @throws AccessDeniedException 
      */
     @PutMapping("/wishes")
     @Timed
-    public ResponseEntity<Wish> updateWish(@Valid @RequestBody Wish wish) throws URISyntaxException {
+    public ResponseEntity<Wish> updateWish(@Valid @RequestBody Wish wish) throws URISyntaxException, AccessDeniedException {
         log.debug("REST request to update Wish : {}", wish);
         if (wish.getId() == null) {
             return createWish(wish);

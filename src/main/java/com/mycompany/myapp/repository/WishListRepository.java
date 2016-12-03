@@ -1,10 +1,11 @@
 package com.mycompany.myapp.repository;
 
-import com.mycompany.myapp.domain.WishList;
-
-import org.springframework.data.jpa.repository.*;
-
 import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+import com.mycompany.myapp.domain.WishList;
 
 /**
  * Spring Data JPA repository for the WishList entity.
